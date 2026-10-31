@@ -34,7 +34,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        scratchpad.saveNow()
+        scratchpad.saveNow(wait: true)
     }
 
     /// Set by the Quit buttons, the only ways to really stop Scratchpad.

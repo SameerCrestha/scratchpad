@@ -78,10 +78,12 @@ func sampleNotes() -> NSAttributedString {
     ⌃⇧⌘4 copies a screenshot, ⌘V pastes it:
 
     """)
-    let picture = NSTextAttachment()
-    picture.image = samplePicture()
-    text.append(NSAttributedString(attachment: picture))
-    text.append(NSAttributedString(string: "\nGroceries: milk, eggs, coffee"))
+    let tiff = samplePicture().tiffRepresentation!
+    let png = NSBitmapImageRep(data: tiff)!.representation(using: .png, properties: [:])!
+    text.append(NSAttributedString(attachment: ScratchAttachment.make(data: png, filename: "Sunset.png")))
+    text.append(NSAttributedString(string: "\nBoarding pass, drag it to Mail:\n"))
+    let pdf = Data(count: 248_000)
+    text.append(NSAttributedString(attachment: ScratchAttachment.make(data: pdf, filename: "Boarding pass.pdf")))
     return text
 }
 

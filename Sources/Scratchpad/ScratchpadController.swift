@@ -67,7 +67,6 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
     func show() {
         panel.setFrame(frameBelowIcon(size: Preferences.shared.panelSize), display: false)
         panel.contentView?.layoutSubtreeIfNeeded()
-        board.textView.fitPictures()
         panel.alphaValue = 0
         panel.makeKeyAndOrderFront(nil)
         panel.makeFirstResponder(board.textView)
@@ -188,17 +187,17 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: work)
     }
 
-    func saveNow() {
+    /// `wait`: when quitting, so the write finishes first.
+    func saveNow(wait: Bool = false) {
         saveWork?.cancel()
         saveWork = nil
         guard hasUnsavedChanges else { return }
         hasUnsavedChanges = false
-        NoteStore.save(board.textView.contents)
+        NoteStore.save(board.textView.contents, wait: wait)
     }
 
     func windowDidEndLiveResize(_ notification: Notification) {
         Preferences.shared.panelSize = panel.frame.size
-        board.textView.fitPictures()
     }
 
     // MARK: Placement

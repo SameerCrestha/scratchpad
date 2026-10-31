@@ -81,16 +81,33 @@ enum NoteStore {
         return NSAttributedString(string: (try? String(contentsOf: plainTextURL, encoding: .utf8)) ?? "")
     }
 
-    static func save(_ text: NSAttributedString) {
+    private static let writes = DispatchQueue(label: "io.github.sameercrestha.scratchpad.save")
+
+    /// Builds the file here (fast) and writes it on a background queue, one save after another,
+    /// so typing does not wait for big attachments. `wait` is for quitting.
+    static func save(_ text: NSAttributedString, wait: Bool = false) {
+        let file: FileWrapper
         do {
-            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-            let file = try text.fileWrapper(
+            file = try text.fileWrapper(
                 from: NSRange(location: 0, length: text.length),
                 documentAttributes: [.documentType: NSAttributedString.DocumentType.rtfd]
             )
-            try file.write(to: fileURL, options: .atomic, originalContentsURL: nil)
         } catch {
             log.error("could not save: \(error.localizedDescription, privacy: .public)")
+            return
+        }
+        let write = {
+            do {
+                try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+                try file.write(to: fileURL, options: .atomic, originalContentsURL: nil)
+            } catch {
+                log.error("could not save: \(error.localizedDescription, privacy: .public)")
+            }
+        }
+        if wait {
+            writes.sync(execute: write)
+        } else {
+            writes.async(execute: write)
         }
     }
 }

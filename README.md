@@ -9,7 +9,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-A855F7?style=flat-square" alt="MIT license"></a>
 </p>
 <p align="center">
-  <em><strong>A notepad in your menu bar.</strong> Click the note icon and a glass scratchpad drops down, like Control Center. Type a note, paste a screenshot, click away. A small Swift app with no tracking.</em>
+  <em><strong>A notepad in your menu bar.</strong> Click the note icon and a glass scratchpad drops down, like Control Center. Type a note, paste a screenshot, park a file, click away. A small Swift app with no tracking.</em>
 </p>
 
 <p align="center">
@@ -29,8 +29,10 @@
 - Click **anywhere else** or switch apps → it hides at once.
 - Click the **pin** → it stays open and floats over your other windows. Drag it anywhere by its header. Put it away with **−** or the icon.
 - **Paste or drop pictures**: screenshots, "Copy Image" from a browser, image files from Finder. They shrink to fit.
-- **Click a picture** to see it big. Pinch or ⌘+ to zoom, ⌘C to copy it, Esc to close.
-- **Copy pictures back out** as real images: select one and press ⌘C, or right-click it → Copy Image.
+- **Drop in any file**: a PDF, a zip, a document (up to 100 MB each). It shows as a small card with its icon, name and size.
+- **Drag pictures and files back out** to Finder, Mail, Slack, a browser upload, any app. You get a copy, and the scratchpad keeps its own.
+- **Click a picture** to see it big. Pinch or ⌘+ to zoom, ⌘C to copy it, Esc to close. **Double-click a file** to open it.
+- **Copy them out** too: select one and press ⌘C, or right-click it → Copy. A picture pastes as an image, a file as a file.
 - **Text pastes plain**, without the fonts and colors of where you copied it from.
 - **Saves as you type.** Nothing to save, nothing to lose when you quit.
 - **You keep your place.** Typing in the scratchpad doesn't pull the app you were in to the back.
@@ -41,8 +43,8 @@
 |---|---|
 | **Liquid Glass** | The same glass as Control Center on macOS 26 and later. The frosted menu look on older macOS. |
 | **One click away** | Lives in the menu bar. No Dock icon, no window to lose behind others. |
-| **Pictures too** | Paste a screenshot straight in, click it to read it big. |
-| **Plain file** | Your notes are an `.rtfd` file that opens in TextEdit. |
+| **Pictures and files** | Paste a screenshot straight in, click it to read it big. Park a file and drag it out later. |
+| **Plain file** | Your notes are an `.rtfd` file that opens in TextEdit, pictures and files included. |
 | **No tracking** | The only network use is a daily check for a new version on GitHub. |
 | **Updates itself** | One click to install, or fully automatic. The update's signature is checked first. |
 | **Starts at login** | On by default, one switch to turn it off. |
@@ -102,7 +104,9 @@ Then open Scratchpad as usual.
 | **Esc**, **⌘W** or **−** | Put it away |
 | **⌘V** or drop | Paste text (always plain) or pictures |
 | Click a picture | See it big (pinch, ⌘+ ⌘− ⌘0 to zoom, ⌘C to copy, Esc to close) |
-| Right-click a picture | Open Large, Copy Image, Open in Preview, Delete |
+| Double-click a file | Open it |
+| Drag a picture or file out | Put a copy in Finder or another app |
+| Right-click a picture or file | Open, Copy, Open in Preview (pictures), Delete |
 | Right-click the note icon | Keep Open, Settings, Quit |
 | Gear button | Settings |
 
@@ -145,6 +149,9 @@ On a Mac with a notch, menu bar icons that don't fit are hidden behind it. Open 
 
 **Does it connect to the internet?**
 Only to check GitHub for a new version once a day, and to download an update when you install one.
+
+**Is there a size limit for files?**
+100 MB per file. Your notes are kept in memory and saved as one file, so very big files stay out (you hear a beep).
 
 **How do I get a screenshot in?**
 Press **⌃⇧⌘4** (Control-Shift-Command-4). That copies the screenshot instead of saving a file. Then click in the scratchpad and press ⌘V. Image files from Finder can be dropped in, or copied and pasted.

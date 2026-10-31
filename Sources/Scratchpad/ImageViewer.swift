@@ -7,13 +7,11 @@ struct Picture {
     let data: Data?
     let filename: String
 
-    init?(_ attachment: NSTextAttachment) {
-        let data = attachment.fileWrapper?.regularFileContents
-        guard let image = attachment.image ?? data.flatMap({ NSImage(data: $0) }) else { return nil }
+    init?(_ attachment: ScratchAttachment) {
+        guard let image = attachment.pictureImage else { return nil }
         self.image = image
-        self.data = data
-        let name = attachment.fileWrapper?.preferredFilename ?? attachment.fileWrapper?.filename ?? ""
-        filename = name.isEmpty || data == nil ? "Picture.png" : name
+        data = attachment.data
+        filename = attachment.filename
     }
 
     /// As an image, so it pastes as a picture anywhere (Messages, Slack, Preview…).
