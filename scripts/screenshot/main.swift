@@ -75,7 +75,7 @@ func sampleNotes() -> NSAttributedString {
     let text = NSMutableAttributedString(string: """
     Call Alex back about the invoice
     Wifi: Garden-5G / sunflower42
-    ⌘⇧4 then paste, it lands here:
+    ⌃⇧⌘4 copies a screenshot, ⌘V pastes it:
 
     """)
     let picture = NSTextAttachment()

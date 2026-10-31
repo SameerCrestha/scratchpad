@@ -55,9 +55,6 @@ struct SettingsView: View {
 
             Section {
                 Toggle("Keep open over other windows", isOn: $prefs.keepsOpen)
-                if #available(macOS 26, *) {
-                    Toggle("Clear glass", isOn: $prefs.clearGlass)
-                }
                 HStack {
                     Text("Notes and pictures")
                     Spacer()
@@ -113,7 +110,7 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 460, height: 636)
+        .frame(width: 460, height: 596)
     }
 
     @ViewBuilder private var updateStatus: some View {

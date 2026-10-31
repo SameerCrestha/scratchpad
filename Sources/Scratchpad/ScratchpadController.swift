@@ -8,6 +8,9 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
     private let panel: ScratchpadPanel
     private let board: BoardView
     private var outsideClickMonitor: Any?
+    /// Where a mouse press in another app started, and whether it turned into a drag.
+    private var outsidePress: NSPoint?
+    private var outsidePressDragged = false
     private var saveWork: DispatchWorkItem?
     private var hasUnsavedChanges = false
     private var subscriptions: Set<AnyCancellable> = []
@@ -43,11 +46,6 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
                 self?.board.setPinned(keepsOpen)
                 self?.updateOutsideClickWatching()
             }
-            .store(in: &subscriptions)
-        Preferences.shared.$clearGlass
-            .dropFirst()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in self?.replaceBackground() }
             .store(in: &subscriptions)
 
         NSWorkspace.shared.notificationCenter.addObserver(
@@ -86,6 +84,7 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
     private func hideNow() {
         guard panel.isVisible else { return }
         saveNow()
+        ImageViewer.shared.close()
         panel.orderOut(nil)
         setIconHighlighted(false)
         updateOutsideClickWatching()
@@ -127,12 +126,6 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
         onOpenSettings?()
     }
 
-    /// After the glass style changes.
-    private func replaceBackground() {
-        board.removeFromSuperview()
-        panel.contentView = makeBackground(size: panel.frame.size, content: board)
-        panel.invalidateShadow()
-    }
 
     @objc private func minimizeClicked() {
         minimizeIntoIcon()
@@ -145,13 +138,36 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
         if shouldWatch, outsideClickMonitor == nil {
             // Only sees clicks in other apps. Clicks on the menu bar icon are Scratchpad's own.
             outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(
-                matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]
-            ) { [weak self] _ in
-                self?.hideIfNotPinned()
+                matching: [.leftMouseDown, .leftMouseDragged, .leftMouseUp, .rightMouseDown, .otherMouseDown]
+            ) { [weak self] event in
+                self?.handleOutsideMouse(event)
             }
         } else if !shouldWatch, let monitor = outsideClickMonitor {
             NSEvent.removeMonitor(monitor)
             outsideClickMonitor = nil
+        }
+    }
+
+    /// A click in another app hides the scratchpad. A drag that ends on it does not, so a
+    /// screenshot thumbnail or a file from Finder can be dropped in.
+    private func handleOutsideMouse(_ event: NSEvent) {
+        let location = NSEvent.mouseLocation
+        switch event.type {
+        case .leftMouseDown:
+            outsidePress = location
+            outsidePressDragged = false
+        case .leftMouseDragged:
+            if let start = outsidePress, hypot(location.x - start.x, location.y - start.y) > 4 {
+                outsidePressDragged = true
+            }
+        case .leftMouseUp:
+            guard outsidePress != nil else { return }
+            outsidePress = nil
+            if !outsidePressDragged || !panel.frame.contains(location) {
+                hideIfNotPinned()
+            }
+        default:
+            hideIfNotPinned()
         }
     }
 

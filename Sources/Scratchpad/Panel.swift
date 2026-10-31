@@ -76,7 +76,9 @@ func makeBackground(size: NSSize, content: NSView) -> NSView {
     content.autoresizingMask = [.width, .height]
     if #available(macOS 26, *) {
         let glass = NSGlassEffectView(frame: frame)
-        glass.style = Preferences.shared.clearGlass ? .clear : .regular
+        // Regular, not clear: clear glass barely blurs other apps' windows, so their text
+        // shows sharp behind the notes.
+        glass.style = .regular
         glass.cornerRadius = cornerRadius
         glass.contentView = content
         return glass

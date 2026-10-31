@@ -29,6 +29,8 @@
 - Click **anywhere else** or switch apps → it hides at once.
 - Click the **pin** → it stays open and floats over your other windows. Drag it anywhere by its header. Put it away with **−** or the icon.
 - **Paste or drop pictures**: screenshots, "Copy Image" from a browser, image files from Finder. They shrink to fit.
+- **Click a picture** to see it big. Pinch or ⌘+ to zoom, ⌘C to copy it, Esc to close.
+- **Copy pictures back out** as real images: select one and press ⌘C, or right-click it → Copy Image.
 - **Text pastes plain**, without the fonts and colors of where you copied it from.
 - **Saves as you type.** Nothing to save, nothing to lose when you quit.
 - **You keep your place.** Typing in the scratchpad doesn't pull the app you were in to the back.
@@ -37,9 +39,9 @@
 
 | | |
 |---|---|
-| **Liquid Glass** | The same glass as Control Center on macOS 26 and later, with a clearer option. The frosted menu look on older macOS. |
+| **Liquid Glass** | The same glass as Control Center on macOS 26 and later. The frosted menu look on older macOS. |
 | **One click away** | Lives in the menu bar. No Dock icon, no window to lose behind others. |
-| **Pictures too** | Paste a screenshot straight in. |
+| **Pictures too** | Paste a screenshot straight in, click it to read it big. |
 | **Plain file** | Your notes are an `.rtfd` file that opens in TextEdit. |
 | **No tracking** | The only network use is a daily check for a new version on GitHub. |
 | **Updates itself** | One click to install, or fully automatic. The update's signature is checked first. |
@@ -99,6 +101,8 @@ Then open Scratchpad as usual.
 | Drag an edge | Resize it. The size is kept. |
 | **Esc**, **⌘W** or **−** | Put it away |
 | **⌘V** or drop | Paste text (always plain) or pictures |
+| Click a picture | See it big (pinch, ⌘+ ⌘− ⌘0 to zoom, ⌘C to copy, Esc to close) |
+| Right-click a picture | Open Large, Copy Image, Open in Preview, Delete |
 | Right-click the note icon | Keep Open, Settings, Quit |
 | Gear button | Settings |
 
@@ -112,7 +116,6 @@ Settings:
 </p>
 
 - Keep it open over other windows (same as the pin)
-- Clear glass, to see more of what is behind it (macOS 26 and later)
 - Show your notes in Finder
 - Start at login (on by default)
 - Check for updates
@@ -143,8 +146,8 @@ On a Mac with a notch, menu bar icons that don't fit are hidden behind it. Open 
 **Does it connect to the internet?**
 Only to check GitHub for a new version once a day, and to download an update when you install one.
 
-**Can I make it see-through?**
-Yes, on macOS 26 and later: Settings → **Clear glass**.
+**How do I get a screenshot in?**
+Press **⌃⇧⌘4** (Control-Shift-Command-4). That copies the screenshot instead of saving a file. Then click in the scratchpad and press ⌘V. Image files from Finder can be dropped in, or copied and pasted.
 
 **Why is pasted text plain?**
 So a note copied from a web page doesn't bring its fonts and colors along. Pictures still paste as pictures.

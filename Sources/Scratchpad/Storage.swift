@@ -15,17 +15,11 @@ final class Preferences: ObservableObject {
         didSet { defaults.set(keepsOpen, forKey: "keepsOpen") }
     }
 
-    /// Clear glass shows more of what is behind it. Regular glass is easier to read (macOS 26 and later).
-    @Published var clearGlass: Bool {
-        didSet { defaults.set(clearGlass, forKey: "clearGlass") }
-    }
-
     @Published var loginItemStatus = SMAppService.mainApp.status
     @Published private(set) var loginItemError: String?
 
     private init() {
         keepsOpen = defaults.bool(forKey: "keepsOpen")
-        clearGlass = defaults.bool(forKey: "clearGlass")
     }
 
     var panelSize: NSSize {
