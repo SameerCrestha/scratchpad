@@ -1,0 +1,36 @@
+name: Release
+
+# Push a tag like v0.1.0 to build the universal app and attach the .dmg to a GitHub release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  dmg:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build app
+        env:
+          SIGNING_P12_BASE64: ${{ secrets.SIGNING_P12_BASE64 }}
+          SIGNING_P12_PASSWORD: ${{ secrets.SIGNING_P12_PASSWORD }}
+        run: |
+          # Every release must use the same certificate, or the app refuses to install the update.
+          if [ -z "$SIGNING_P12_BASE64" ]; then
+            echo "::error::Secret SIGNING_P12_BASE64 is missing"
+            exit 1
+          fi
+          echo "$SIGNING_P12_BASE64" | base64 --decode > "$RUNNER_TEMP/signing.p12"
+          SIGNING_P12="$RUNNER_TEMP/signing.p12" ARCHS="arm64 x86_64" VERSION="${GITHUB_REF_NAME#v}" scripts/build-app.sh
+
+      - name: Build DMG
+        run: scripts/make-dmg.sh
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" build/*.dmg --title "$GITHUB_REF_NAME" --generate-notes
