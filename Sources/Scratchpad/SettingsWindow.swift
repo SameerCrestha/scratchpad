@@ -63,7 +63,7 @@ struct SettingsView: View {
             } header: {
                 Text("Scratchpad")
             } footer: {
-                Text("When it is not kept open, it hides as soon as you click anywhere else. The pin button in the scratchpad does the same as the switch.")
+                Text("On by default. When it is off, it hides as soon as you click anywhere else. The pin button in the scratchpad does the same as the switch.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

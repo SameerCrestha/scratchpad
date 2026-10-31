@@ -1,5 +1,5 @@
 // Draws docs/demo.gif for the README: open the scratchpad, type, paste a screenshot, view it
-// big, pin, drop a file in, drag it out to Mail, put it away. A drawing, not a screen
+// big, drop a file in, drag it out to Mail, put it away. A drawing, not a screen
 // recording, but the scratchpad itself is the app's real BoardView.
 // Run through scripts/demo-gif.sh. Mostly flat colors: GIF has 256 colors per frame.
 import AppKit
@@ -184,7 +184,7 @@ struct BoardState: Hashable {
     var typed = 0
     var picture = false
     var file = false
-    var pinned = false
+    var pinned = true
 }
 
 var boardCache: [BoardState: CGImage] = [:]
@@ -254,6 +254,7 @@ struct Frame {
     var captionAlpha: CGFloat = 0
     var keycap: String?
     var keycapAlpha: CGFloat = 0
+    var keycapAt = CGPoint.zero
     var viewer = 0.0           // 0 closed, 1 open
     var drag: (image: NSImage, at: CGPoint)?
     var mail = 0.0
@@ -437,7 +438,7 @@ func drawCaption(_ f: Frame) {
 
 func drawKeycap(_ f: Frame) {
     guard let key = f.keycap, f.keycapAlpha > 0 else { return }
-    let cap = CGRect(x: panelRect.minX - 70, y: panelRect.minY + 150, width: 56, height: 40)
+    let cap = CGRect(x: f.keycapAt.x, y: f.keycapAt.y, width: 56, height: 40)
     rgb(0xF2F2F5, f.keycapAlpha).setFill()
     rounded(cap, 8).fill()
     rgb(0xB8B8C0, f.keycapAlpha).setFill()
@@ -513,8 +514,9 @@ func caption(_ text: String) {
     animate(0.16) { t in s.captionAlpha = CGFloat(t) }
 }
 
-func keycap(_ key: String) {
+func keycap(_ key: String, at origin: CGPoint) {
     s.keycap = key
+    s.keycapAt = origin
     animate(0.12) { t in s.keycapAlpha = CGFloat(t) }
 }
 
@@ -530,7 +532,8 @@ caption("Click the note icon")
 move(to: CGPoint(x: noteIcon.midX + 2, y: noteIcon.midY + 2), 0.7)
 click()
 s.iconOn = true
-animate(0.16) { t in s.panel = t }
+s.panel = 1
+animate(0.24) { t in s.minimize = 1 - t }
 
 // 2. Type
 caption("Type a note")
@@ -544,7 +547,7 @@ hold(0.6)
 
 // 3. Paste a screenshot
 caption("Paste a screenshot")
-keycap("⌘V")
+keycap("⌘V", at: CGPoint(x: panelRect.minX - 70, y: panelRect.minY + 150))
 hold(0.3)
 s.caret = false
 s.board.picture = true
@@ -562,20 +565,12 @@ click()
 animate(0.26) { t in s.viewer = t }
 s.cursorKind = .arrow
 hold(1.8)
-keycap("esc")
+keycap("esc", at: CGPoint(x: viewerRect.maxX - 56, y: viewerRect.maxY + 6))
 hold(0.3)
 animate(0.18) { t in s.viewer = 1 - t }
 hideKeycap()
 
-// 5. Pin
-caption("Pin it to keep it open")
-let pin = sceneRect(fromBoard: board.pinButton.frame)
-move(to: CGPoint(x: pin.midX, y: pin.midY), 0.6, bend: 20)
-click()
-s.board.pinned = true
-hold(0.8)
-
-// 6. Drop a file in
+// 5. Drop a file in
 caption("Drop in a file")
 move(to: desktopFile, 0.8, bend: 60)
 s.drag = (pdfIcon, s.cursor)
@@ -586,7 +581,7 @@ s.drag = nil
 s.board.file = true
 hold(0.9)
 
-// 7. Drag it out to another app
+// 6. Drag it out to another app
 caption("Drag it out to any app")
 animate(0.24) { t in s.mail = t }
 let chip = attachmentRect(file: true, in: s.board)
@@ -603,7 +598,7 @@ s.mailHighlight = false
 s.mailAttachment = true
 hold(1.1)
 
-// 8. Put it away
+// 7. Put it away
 caption("Click the icon to put it away")
 move(to: CGPoint(x: noteIcon.midX + 2, y: noteIcon.midY + 2), 0.8, bend: -50)
 click()

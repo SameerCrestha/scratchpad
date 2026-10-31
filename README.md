@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/demo.gif" alt="Click the note icon, type a note, paste a screenshot and open it big, pin the scratchpad, drop in a PDF, drag it out to Mail, click the icon to put it away" width="720">
+  <img src="docs/demo.gif" alt="Click the note icon and the scratchpad grows out of it, type a note, paste a screenshot and open it big, drop in a PDF, drag it out to Mail, click the icon to put it away" width="720">
 </p>
 
 > [!IMPORTANT]
@@ -28,10 +28,10 @@
   </picture>
 </p>
 
-- Click the **note icon** in the menu bar → the scratchpad opens right under it.
+- Click the **note icon** in the menu bar → the scratchpad grows out of it, right under it.
 - Click the icon again, the **−** button or press **Esc** → it shrinks back into the icon.
-- Click **anywhere else** or switch apps → it hides at once.
-- Click the **pin** → it stays open and floats over your other windows. Drag it anywhere by its header. Put it away with **−** or the icon.
+- It **stays open** over your other windows while you work (the pin is on). Drag it anywhere by its header.
+- **Unpin it** and it hides as soon as you click anywhere else or switch apps.
 - **Paste or drop pictures**: screenshots, "Copy Image" from a browser, image files from Finder. They shrink to fit.
 - **Drop in any file**: a PDF, a zip, a document (up to 100 MB each). It shows as a small card with its icon, name and size.
 - **Drag pictures and files back out** to Finder, Mail, Slack, a browser upload, any app. You get a copy, and the scratchpad keeps its own.
@@ -123,7 +123,7 @@ Settings:
   </picture>
 </p>
 
-- Keep it open over other windows (same as the pin)
+- Keep it open over other windows (same as the pin, on by default)
 - Show your notes in Finder
 - Start at login (on by default)
 - Check for updates

@@ -14,6 +14,8 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
     private var saveWork: DispatchWorkItem?
     private var hasUnsavedChanges = false
     private var subscriptions: Set<AnyCancellable> = []
+    /// The picture growing out of the icon while it opens.
+    private var openingGhost: NSWindow?
 
     var isVisible: Bool { panel.isVisible }
     var onOpenSettings: (() -> Void)?
@@ -57,6 +59,7 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
     }
 
     func toggle() {
+        guard openingGhost == nil else { return }
         if panel.isVisible {
             minimizeIntoIcon()
         } else {
@@ -64,18 +67,39 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
         }
     }
 
+    /// Grows a picture of the scratchpad out of the icon, the way it shrinks back in,
+    /// then puts the real one in its place.
     func show() {
-        panel.setFrame(frameBelowIcon(size: Preferences.shared.panelSize), display: false)
+        guard !panel.isVisible, openingGhost == nil else { return }
+        let frame = frameBelowIcon(size: Preferences.shared.panelSize)
+        panel.setFrame(frame, display: false)
         panel.contentView?.layoutSubtreeIfNeeded()
-        panel.alphaValue = 0
+        setIconHighlighted(true)
+        guard let icon = iconFrame(), let picture = snapshot(of: board) else {
+            appear()
+            return
+        }
+        let ghost = makeGhost(frame: NSRect(x: icon.midX - 10, y: icon.midY - 8, width: 20, height: 16), picture: picture)
+        ghost.alphaValue = 0.15
+        ghost.orderFrontRegardless()
+        openingGhost = ghost
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = 0.22
+            context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            ghost.animator().setFrame(frame, display: true)
+            ghost.animator().alphaValue = 1
+        }, completionHandler: { [weak self] in
+            self?.appear()
+            ghost.orderOut(nil)
+            self?.openingGhost = nil
+        })
+    }
+
+    private func appear() {
+        panel.alphaValue = 1
         panel.makeKeyAndOrderFront(nil)
         panel.makeFirstResponder(board.textView)
         panel.invalidateShadow()
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.12
-            self.panel.animator().alphaValue = 1
-        }
-        setIconHighlighted(true)
         updateOutsideClickWatching()
     }
 

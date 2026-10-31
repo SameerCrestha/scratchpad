@@ -19,6 +19,8 @@ final class Preferences: ObservableObject {
     @Published private(set) var loginItemError: String?
 
     private init() {
+        // Pinned unless turned off.
+        defaults.register(defaults: ["keepsOpen": true])
         keepsOpen = defaults.bool(forKey: "keepsOpen")
     }
 
