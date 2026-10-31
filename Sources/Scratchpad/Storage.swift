@@ -28,7 +28,9 @@ final class Preferences: ObservableObject {
         get {
             let width = defaults.double(forKey: "panelWidth")
             let height = defaults.double(forKey: "panelHeight")
-            return width > 0 && height > 0 ? NSSize(width: width, height: height) : NSSize(width: 340, height: 380)
+            // Smaller than the panel allows means it was saved by mistake (0.5.1 test builds saved
+            // the size it had while shrinking into the icon).
+            return width >= 240 && height >= 180 ? NSSize(width: width, height: height) : NSSize(width: 340, height: 380)
         }
         set {
             defaults.set(Double(newValue.width), forKey: "panelWidth")

@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/demo.gif" alt="Click the note icon and the scratchpad grows out of it, type a note, paste a screenshot and open it big, drop in a PDF, drag it out to Mail, click the icon to put it away" width="720">
+  <img src="docs/demo.gif" alt="Click the note icon and the scratchpad opens, type a note, paste a screenshot and open it big, drop in a PDF, drag it out to Mail, click the icon to put it away" width="720">
 </p>
 
 > [!IMPORTANT]
@@ -28,7 +28,7 @@
   </picture>
 </p>
 
-- Click the **note icon** in the menu bar → the scratchpad grows out of it, right under it.
+- Click the **note icon** in the menu bar → the scratchpad opens right under it.
 - Click the icon again, the **−** button or press **Esc** → it shrinks back into the icon.
 - It **stays open** over your other windows while you work (the pin is on). Drag it anywhere by its header.
 - **Unpin it** and it hides as soon as you click anywhere else or switch apps.
