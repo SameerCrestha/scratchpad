@@ -157,9 +157,6 @@ Only to check GitHub for a new version once a day, and to download an update whe
 **Is there a size limit for files?**
 100 MB per file. Your notes are kept in memory and saved as one file, so very big files stay out (you hear a beep).
 
-**How do I get a screenshot in?**
-Press **⌃⇧⌘4** (Control-Shift-Command-4). That copies the screenshot instead of saving a file. Then click in the scratchpad and press ⌘V. Image files from Finder can be dropped in, or copied and pasted.
-
 **Why is pasted text plain?**
 So a note copied from a web page doesn't bring its fonts and colors along. Pictures still paste as pictures.
 
