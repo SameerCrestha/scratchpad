@@ -11,6 +11,7 @@ scripts/run-local.sh     # build, restart the app (a normal start opens the scra
 scripts/build-app.sh     # build build/Scratchpad.app
 scripts/make-dmg.sh      # pack it into build/Scratchpad.dmg
 scripts/screenshot.sh    # take the README pictures into docs/ (flashes windows on screen)
+scripts/demo-gif.sh      # draw docs/demo.gif (offscreen, uses the real BoardView)
 swift scripts/app-icon.swift build/AppIcon.iconset && iconutil -c icns build/AppIcon.iconset -o Resources/AppIcon.icns
 ```
 

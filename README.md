@@ -13,16 +13,20 @@
 </p>
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/panel-dark.png">
-    <img src="docs/panel-light.png" alt="The scratchpad open under its menu bar icon, with notes and a pasted picture" width="600">
-  </picture>
+  <img src="docs/demo.gif" alt="Click the note icon, type a note, paste a screenshot and open it big, pin the scratchpad, drop in a PDF, drag it out to Mail, click the icon to put it away" width="720">
 </p>
 
 > [!IMPORTANT]
 > I don't have a paid Apple Developer account, so Scratchpad is not notarized. The first time you open it, macOS says "Apple could not verify…". This is expected. One Terminal command fixes it, and you only do it once. See [First open](#first-open).
 
 ## What it does
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/panel-dark.png">
+    <img src="docs/panel-light.png" alt="The scratchpad open under its menu bar icon, with notes, a pasted picture and a file" width="600">
+  </picture>
+</p>
 
 - Click the **note icon** in the menu bar → the scratchpad opens right under it.
 - Click the icon again, the **−** button or press **Esc** → it shrinks back into the icon.
