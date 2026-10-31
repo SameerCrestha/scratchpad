@@ -350,38 +350,65 @@ func drawMail(_ f: Frame, _ ctx: CGContext) {
     ctx.restoreGState()
 }
 
+/// The scene is drawn top-down, the genie shape works bottom-up: this flips between them.
+func flip(_ rect: CGRect) -> CGRect {
+    CGRect(x: rect.minX, y: size.height - rect.maxY, width: rect.width, height: rect.height)
+}
+
+/// The app's genie shape: the glass clipped to the funnel, the board drawn in strips.
+func drawGenie(_ f: Frame, _ ctx: CGContext) {
+    let neck = CGRect(x: noteIcon.midX - 10, y: noteIcon.midY - 2, width: 20, height: 4)
+    let shape = GenieShape(panel: flip(panelRect), target: flip(neck))
+    let outline = shape.outline(f.minimize).map { CGPoint(x: $0.x, y: size.height - $0.y) }
+    ctx.saveGState()
+    ctx.setAlpha(CGFloat(f.panel) * shape.alpha(f.minimize))
+    ctx.saveGState()
+    ctx.addLines(between: outline)
+    ctx.closePath()
+    ctx.clip()
+    draw(blurredWallpaper, in: CGRect(origin: .zero, size: size), ctx)
+    rgb(0x15151B, 0.42).setFill()
+    CGRect(origin: .zero, size: size).fill()
+    ctx.restoreGState()
+    let image = boardImage(f.board)
+    let pixels = CGFloat(image.height)
+    for strip in shape.strips(f.minimize) {
+        let slice = CGRect(x: 0, y: ((1 - strip.to) * pixels).rounded(.down), width: CGFloat(image.width),
+                           height: max(1, ((strip.to - strip.from) * pixels).rounded(.up)))
+        if let piece = image.cropping(to: slice) { draw(piece, in: flip(strip.rect), ctx) }
+    }
+    ctx.restoreGState()
+}
+
 /// Glass: the blurred wallpaper, a dark tint and a bright rim, with the real board on top.
 func drawPanel(_ f: Frame, _ ctx: CGContext) {
     guard f.panel > 0 else { return }
-    let icon = CGRect(x: noteIcon.midX - 10, y: noteIcon.midY - 8, width: 20, height: 16)
-    let t = smoothstep(f.minimize)
-    let rect = lerp(panelRect, icon, t)
-    let alpha = CGFloat(f.panel) * (1 - 0.85 * CGFloat(t))
-    let radius = max(4, 12 * (1 - CGFloat(t)))
-
-    ctx.saveGState()
-    ctx.setAlpha(alpha)
-    if t == 0 {
-        ctx.saveGState()
-        ctx.setShadow(offset: CGSize(width: 0, height: -8 * scale), blur: 24 * scale, color: rgb(0x000000, 0.4).cgColor)
-        rgb(0x000000, 0.01).setFill()
-        rounded(rect, radius).fill()
-        ctx.restoreGState()
+    if f.minimize > 0 {
+        drawGenie(f, ctx)
+        return
     }
+    let rect = panelRect
     ctx.saveGState()
-    rounded(rect, radius).addClip()
+    ctx.setAlpha(CGFloat(f.panel))
+    ctx.saveGState()
+    ctx.setShadow(offset: CGSize(width: 0, height: -8 * scale), blur: 24 * scale, color: rgb(0x000000, 0.4).cgColor)
+    rgb(0x000000, 0.01).setFill()
+    rounded(rect, 12).fill()
+    ctx.restoreGState()
+    ctx.saveGState()
+    rounded(rect, 12).addClip()
     draw(blurredWallpaper, in: CGRect(origin: .zero, size: size), ctx)
     rgb(0x15151B, 0.42).setFill()
     rect.fill()
     ctx.restoreGState()
     rgb(0xFFFFFF, 0.22).setStroke()
-    let rim = rounded(rect.insetBy(dx: 0.5, dy: 0.5), radius - 0.5)
+    let rim = rounded(rect.insetBy(dx: 0.5, dy: 0.5), 11.5)
     rim.lineWidth = 1
     rim.stroke()
     draw(boardImage(f.board), in: rect, ctx)
     ctx.restoreGState()
 
-    if f.caret, t == 0 {
+    if f.caret {
         let caret = sceneRect(ofCharacter: f.board.typed, in: f.board)
         rgb(0xFFFFFF).setFill()
         CGRect(x: caret.minX, y: caret.minY, width: 1.5, height: max(caret.height, 16)).fill()
@@ -533,7 +560,7 @@ move(to: CGPoint(x: noteIcon.midX + 2, y: noteIcon.midY + 2), 0.7)
 click()
 s.iconOn = true
 s.panel = 1
-animate(0.24) { t in s.minimize = 1 - t }
+animate(0.5) { t in s.minimize = 1 - t }
 
 // 2. Type
 caption("Type a note")
@@ -602,7 +629,7 @@ hold(1.1)
 caption("Click the icon to put it away")
 move(to: CGPoint(x: noteIcon.midX + 2, y: noteIcon.midY + 2), 0.8, bend: -50)
 click()
-animate(0.26) { t in s.minimize = t }
+animate(0.5) { t in s.minimize = t }
 s.panel = 0
 s.minimize = 0
 s.iconOn = false

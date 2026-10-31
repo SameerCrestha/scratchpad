@@ -1,6 +1,5 @@
 import AppKit
 import Combine
-import QuartzCore
 
 /// Shows the scratchpad under the menu bar icon and hides it again.
 final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate {
@@ -14,8 +13,8 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
     private var saveWork: DispatchWorkItem?
     private var hasUnsavedChanges = false
     private var subscriptions: Set<AnyCancellable> = []
-    /// The picture growing out of the icon while it opens.
-    private var openingGhost: NSWindow?
+    /// The genie effect while it opens or closes.
+    private var genie: GenieAnimation?
 
     var isVisible: Bool { panel.isVisible }
     var onOpenSettings: (() -> Void)?
@@ -59,7 +58,7 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
     }
 
     func toggle() {
-        guard openingGhost == nil else { return }
+        guard genie == nil else { return }
         if panel.isVisible {
             minimizeIntoIcon()
         } else {
@@ -67,10 +66,9 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
         }
     }
 
-    /// Grows a picture of the scratchpad out of the icon, the way it shrinks back in,
-    /// then puts the real one in its place.
+    /// The genie effect out of the icon, then the real scratchpad takes its place.
     func show() {
-        guard !panel.isVisible, openingGhost == nil else { return }
+        guard !panel.isVisible, genie == nil else { return }
         let frame = frameBelowIcon(size: Preferences.shared.panelSize)
         panel.setFrame(frame, display: false)
         panel.contentView?.layoutSubtreeIfNeeded()
@@ -79,20 +77,12 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
             appear()
             return
         }
-        let ghost = makeGhost(frame: NSRect(x: icon.midX - 10, y: icon.midY - 8, width: 20, height: 16), picture: picture)
-        ghost.alphaValue = 0.15
-        ghost.orderFrontRegardless()
-        openingGhost = ghost
-        NSAnimationContext.runAnimationGroup({ context in
-            context.duration = 0.22
-            context.timingFunction = CAMediaTimingFunction(name: .easeOut)
-            ghost.animator().setFrame(frame, display: true)
-            ghost.animator().alphaValue = 1
-        }, completionHandler: { [weak self] in
+        let genie = GenieAnimation(picture: picture, panel: frame, icon: icon, opening: true, level: panel.level) { [weak self] in
             self?.appear()
-            ghost.orderOut(nil)
-            self?.openingGhost = nil
-        })
+            self?.genie = nil
+        }
+        self.genie = genie
+        genie.run()
     }
 
     private func appear() {
@@ -117,27 +107,20 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
         if !Preferences.shared.keepsOpen { hideNow() }
     }
 
-    /// Shrinks a picture of the scratchpad into the menu bar icon. The real panel hides at once,
-    /// so its text does not reflow while it shrinks.
+    /// The genie effect into the menu bar icon. The real panel hides as it starts, so its text
+    /// does not reflow on the way.
     func minimizeIntoIcon() {
-        guard panel.isVisible else { return }
+        guard panel.isVisible, genie == nil else { return }
         guard let icon = iconFrame(), let picture = snapshot(of: board) else {
             hideNow()
             return
         }
-        let ghost = makeGhost(frame: panel.frame, picture: picture)
-        ghost.order(.above, relativeTo: panel.windowNumber)
+        let genie = GenieAnimation(picture: picture, panel: panel.frame, icon: icon, opening: false, level: panel.level) { [weak self] in
+            self?.genie = nil
+        }
+        self.genie = genie
+        genie.run()
         hideNow()
-
-        let end = NSRect(x: icon.midX - 10, y: icon.midY - 8, width: 20, height: 16)
-        NSAnimationContext.runAnimationGroup({ context in
-            context.duration = 0.22
-            context.timingFunction = CAMediaTimingFunction(name: .easeIn)
-            ghost.animator().setFrame(end, display: true)
-            ghost.animator().alphaValue = 0.15
-        }, completionHandler: {
-            ghost.orderOut(nil)
-        })
     }
 
     @objc private func pinClicked() {
@@ -253,7 +236,7 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
         setIconHighlighted(panel.isVisible)
     }
 
-    // MARK: Minimize animation
+    // MARK: Genie
 
     private func snapshot(of view: NSView) -> NSImage? {
         guard let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return nil }
@@ -261,24 +244,5 @@ final class ScratchpadController: NSObject, NSWindowDelegate, NSTextViewDelegate
         let image = NSImage(size: view.bounds.size)
         image.addRepresentation(bitmap)
         return image
-    }
-
-    /// The same glass background with a picture of the text on top. The background
-    /// stays live while it shrinks, so it looks like the real thing.
-    private func makeGhost(frame: NSRect, picture: NSImage) -> NSWindow {
-        let ghost = NSWindow(contentRect: frame, styleMask: .borderless, backing: .buffered, defer: false)
-        ghost.isOpaque = false
-        ghost.backgroundColor = .clear
-        ghost.hasShadow = false
-        ghost.ignoresMouseEvents = true
-        ghost.isReleasedWhenClosed = false
-        ghost.level = panel.level
-        ghost.collectionBehavior = panel.collectionBehavior
-
-        let imageView = NSImageView()
-        imageView.image = picture
-        imageView.imageScaling = .scaleAxesIndependently
-        ghost.contentView = makeBackground(size: frame.size, content: imageView)
-        return ghost
     }
 }
